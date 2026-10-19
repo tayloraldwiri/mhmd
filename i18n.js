@@ -614,6 +614,9 @@ dictionaries.uk={
 Object.assign(dictionaries.de,{'إيقاف الحركة':'Animationen pausieren','تشغيل الحركة':'Animationen aktivieren','العودة إلى الأعلى':'Nach oben'});
 Object.assign(dictionaries.en,{'إيقاف الحركة':'Pause animations','تشغيل الحركة':'Enable animations','العودة إلى الأعلى':'Back to top'});
 Object.assign(dictionaries.uk,{'إيقاف الحركة':'Призупинити анімацію','تشغيل الحركة':'Увімкнути анімацію','العودة إلى الأعلى':'На початок'});
+Object.assign(dictionaries.de,{"تجدنا في فوبرتال":"Besuchen Sie uns in Wuppertal","قريبون منك.":"Ganz in Ihrer Nähe.","خطوة بخطوة.":"Schritt für Schritt.","ألمانيا":"Deutschland","الطريق إلينا يبدأ هنا":"Hier beginnt Ihr Weg zu uns","الحصول على الاتجاهات":"Route planen","موقعنا على خرائط Google":"Unser Standort auf Google Maps"});
+Object.assign(dictionaries.en,{"تجدنا في فوبرتال":"Find us in Wuppertal","قريبون منك.":"Closer to you.","خطوة بخطوة.":"Step by step.","ألمانيا":"Germany","الطريق إلينا يبدأ هنا":"Your way to us starts here","الحصول على الاتجاهات":"Get directions","موقعنا على خرائط Google":"Our location on Google Maps"});
+Object.assign(dictionaries.uk,{"تجدنا في فوبرتال":"Завітайте до нас у Вупперталі","قريبون منك.":"Поруч із вами.","خطوة بخطوة.":"Крок за кроком.","ألمانيا":"Німеччина","الطريق إلينا يبدأ هنا":"Ваш шлях до нас починається тут","الحصول على الاتجاهات":"Прокласти маршрут","موقعنا على خرائط Google":"Наше розташування на Google Maps"});
 // Arabic is the default; visitors can select German, English or Ukrainian.
 const multilingualEnabled=true;
 let language='ar';if(multilingualEnabled){try{const saved=localStorage.getItem('klarwerk-language');language=['ar','de','en','uk'].includes(saved)?saved:'ar'}catch{}}
@@ -636,11 +639,13 @@ function translatePage(){
   const trim=original.trim();if(!trim)continue;const output=original.replace(trim,translateText(trim));
   originals.set(node,{original,output});if(node.textContent!==output)node.textContent=output;
  }
- document.querySelectorAll('[aria-label],[placeholder],meta[name="description"]').forEach(el=>{
+ document.querySelectorAll('[aria-label],[placeholder],iframe[title],meta[name="description"]').forEach(el=>{
   let values=originalAttributes.get(el)||{};
-  for(const name of ['aria-label','placeholder','content']){if(!el.hasAttribute(name))continue;const current=el.getAttribute(name),old=values[name];const original=old&&old.output===current?old.original:current;const output=translateText(original);values[name]={original,output};if(current!==output)el.setAttribute(name,output)}
+  for(const name of ['aria-label','placeholder','content','title']){if(!el.hasAttribute(name))continue;const current=el.getAttribute(name),old=values[name];const original=old&&old.output===current?old.original:current;const output=translateText(original);values[name]={original,output};if(current!==output)el.setAttribute(name,output)}
   originalAttributes.set(el,values);
  });
+ const map=document.querySelector('.location-map iframe');
+ if(map&&map.dataset.language!==language){const url=new URL(map.src);url.searchParams.set('hl',language);map.src=url.href;map.dataset.language=language;}
  document.documentElement.lang=language;
  document.documentElement.dir=language==='ar'?'rtl':'ltr';
  document.querySelector('.language-switch').dataset.active=language;
